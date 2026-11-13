@@ -1,0 +1,17 @@
+# Packages tv-clean.sh will disable, one per line (only if installed).
+# Comment out (#) anything you want to keep; add vendor bloat you see in
+#   adb shell pm list packages
+#
+# NOTE: the stock launchers (com.google.android.apps.tv.launcherx,
+# com.google.android.tvlauncher, com.google.android.leanbacklauncher) are
+# deliberately NOT listed: disabling them without a working replacement can
+# leave the TV with no home screen. Use --set-home with Clean Home instead.
+
+# Recommendation / "sponsored" rows
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+
+# Rarely-used preinstalled Google apps
+com.google.android.play.games
+com.google.android.videos
+com.google.android.youtube.tvmusic

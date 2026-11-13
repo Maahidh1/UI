@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.CleanHome" parent="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/background</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:colorAccent">@color/focus</item>
+    </style>
+</resources>

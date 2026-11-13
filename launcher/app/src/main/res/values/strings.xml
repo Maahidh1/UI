@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Clean Home</string>
+    <string name="move_to_front">Move to front</string>
+    <string name="hide_app">Hide from home</string>
+    <string name="app_info">App info</string>
+    <string name="settings">Settings</string>
+    <string name="show_hidden">Show %d hidden</string>
+</resources>
