@@ -20,7 +20,6 @@ A() { adb -s "$TARGET" shell "$@" </dev/null; }
 while read -r action pkg; do
   case "$action" in
     disabled)    A pm enable --user 0 "$pkg" >/dev/null && echo "enabled   $pkg" ;;
-    uninstalled) A cmd package install-existing --user 0 "$pkg" >/dev/null && echo "restored  $pkg" ;;
     home)
       # pkg holds the home activity that was active before tv-clean.sh ran.
       if [[ "$pkg" == */* && "$pkg" != android/* ]]; then

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Declutter an Android TV / Google TV home screen over ADB.
 #
-# Everything is reversible: each package touched is recorded in
-# tv-clean.state, and tv-restore.sh re-enables them all.
+# Only ever uses `pm disable-user --user 0` (never uninstall). Each package
+# touched is recorded in tv-clean.state; tv-restore.sh re-enables them all.
+# Packages matching protected.sh (keyboard, Play Store/services, Bluetooth,
+# Wi-Fi, remote/input, settings, updates) are refused outright.
 #
 # Usage:
 #   ./tv-clean.sh <TV_IP>                       # dry run: show what would change
@@ -47,12 +49,18 @@ adb -s "$TARGET" wait-for-device
 # </dev/null: stop adb from eating the stdin of surrounding read loops.
 A() { adb -s "$TARGET" shell "$@" </dev/null; }
 
+source "$DIR/protected.sh"
+
 INSTALLED="$(A pm list packages | sed 's/^package://' | tr -d '\r')"
 
 # Read package list, skipping comments/blank lines (bash 3.2 compatible).
 TO_DISABLE=()
 while read -r pkg _; do
   [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+  if is_protected "$pkg"; then
+    echo "REFUSING protected package: $pkg (remove it from packages.txt)" >&2
+    exit 1
+  fi
   if grep -qx "$pkg" <<<"$INSTALLED"; then
     TO_DISABLE+=("$pkg")
   fi
@@ -86,13 +94,8 @@ for pkg in ${TO_DISABLE[@]+"${TO_DISABLE[@]}"}; do
   if A pm disable-user --user 0 "$pkg" 2>&1 | grep -q "new state: disabled"; then
     echo "disabled  $pkg"
     echo "disabled $pkg" >>"$STATE"
-  # Some builds block disabling system apps; fall back to removing for
-  # user 0 only (APK stays on the system partition and can be restored).
-  elif A pm uninstall -k --user 0 "$pkg" 2>&1 | grep -q "Success"; then
-    echo "removed   $pkg (for user 0, restorable)"
-    echo "uninstalled $pkg" >>"$STATE"
   else
-    echo "skipped   $pkg (device refused)"
+    echo "skipped   $pkg (device refused; not uninstalling)"
   fi
 done
 
